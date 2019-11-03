@@ -64,7 +64,13 @@ class DataProcessor():
 
 		return x_train, x_valid, y_train, y_valid
 
-	def get_numpy_data(self, fillna = True, encode = True, np_split = True, enocde_user = False): 
+	def _normalize(self, mat):
+		means = np.mean(mat, axis = 0)
+		stds = np.std(mat, axis = 0)
+
+		return mat-means/stds
+
+	def get_numpy_data(self, fillna = True, encode = True, np_split = True, enocde_user = False, normalize = True): 
 
 		df = self._load_file(self.file)
 
@@ -83,12 +89,13 @@ class DataProcessor():
 			df = self._drop_col(df, self.user_col)
 		
 		if np_split is True:
-			return self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
+			if normalize is True :
+				xtr, xva, ytr, yva = self._extract_features_labels(df, self.label_col)
+				return self._normalize(xtr), self._normalize(self.x_valid), ytr, yva
+			else:
+				return self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
 		else:
 			return self._extract_features_labels(df, self.label_col)
-
-
-	#def get_nomralized_numpy_data(self, data): 
 
 
 def main():
