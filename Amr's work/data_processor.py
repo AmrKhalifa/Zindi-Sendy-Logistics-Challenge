@@ -67,7 +67,7 @@ class DataProcessor():
 	def _normalize(self, mat):
 		means = np.mean(mat, axis = 0)
 		stds = np.std(mat, axis = 0)
-
+		stds += 1e-5
 		return mat-means/stds
 
 	def get_numpy_data(self, fillna = True, encode = True, np_split = True, enocde_user = False, normalize = True): 
@@ -90,8 +90,8 @@ class DataProcessor():
 		
 		if np_split is True:
 			if normalize is True :
-				xtr, xva, ytr, yva = self._extract_features_labels(df, self.label_col)
-				return self._normalize(xtr), self._normalize(self.x_valid), ytr, yva
+				xtr, xva, ytr, yva = self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
+				return self._normalize(xtr), self._normalize(xva), ytr, yva
 			else:
 				return self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
 		else:
