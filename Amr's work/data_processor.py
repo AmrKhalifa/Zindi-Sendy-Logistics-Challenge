@@ -5,15 +5,30 @@ from sklearn.model_selection import train_test_split
 
 class DataProcessor():
 
-	def __init__(self): 
-		self.file = "../data/Train.csv"
-		self.time_attributes = ['Placement - Time', 'Confirmation - Time', 'Arrival at Pickup - Time', 'Pickup - Time', 'Arrival at Destination - Time']	
+	def __init__(self, file = None, test = False, minimal = True ):
+		if file is None :  
+			self.file = "../data/Train.csv"
+		else: self.file = file
+		if test is False:
+			if minimal is True:
+				self.time_attributes = ['Placement - Time', 'Confirmation - Time', 'Arrival at Pickup - Time', 'Pickup - Time']
+			else:
+				self.time_attributes = ['Placement - Time', 'Confirmation - Time', 'Arrival at Pickup - Time', 'Pickup - Time', 'Arrival at Destination - Time'] 		
+		else:
+			self.time_attributes = ['Placement - Time', 'Confirmation - Time', 'Arrival at Pickup - Time', 'Pickup - Time']	
 		self.categorical_attributes = ['User Id' , 'Vehicle Type', 'Platform Type', 'Rider Id', 'Personal or Business']
 		self.label_col = 'Time from Pickup to Arrival'
 		self.encoder = LabelEncoder
 		self.one_hot = None
 		self.user_col = ['User Id']
-		self.cols_to_drop = ['Order No', 'Precipitation in millimeters']
+		if test is False:
+			if minimal is True:  
+				self.cols_to_drop = ['Order No', 'Precipitation in millimeters', 'Arrival at Destination - Day of Month', 'Arrival at Destination - Weekday (Mo = 1)', 'Arrival at Destination - Time']
+			else: 
+				self.cols_to_drop = ['Order No', 'Precipitation in millimeters']
+		else: 
+			self.cols_to_drop = ['Order No', 'Precipitation in millimeters']
+		self.test = test 
 
 	def _load_file(self, file): 
 		train_df = pd.read_csv(file)
@@ -51,18 +66,26 @@ class DataProcessor():
 
 	def _extract_features_labels(self, df, label_col):
 
-		feature_cols = df.columns.drop([label_col])
+		if self.test is False:
+			feature_cols = df.columns.drop([label_col])
+			X = df[feature_cols]
+			Y = df[[label_col]] 
+			return X, Y
+		else:
+			return df
 
-		X = df[feature_cols]
-		Y = df[[label_col]]
-
-		return X, Y
 
 	def _get_numpy_train_valid_data(self, data):
-		X, Y = data
-		x_train, x_valid, y_train, y_valid = train_test_split(X.values, Y.values, test_size=0.33)
+		
+		if self.test is False: 
+			X, Y = data
+			x_train, x_valid, y_train, y_valid = train_test_split(X.values, Y.values, test_size=0.33)
 
-		return x_train, x_valid, y_train, y_valid
+			return x_train, x_valid, y_train, y_valid
+		
+		else:
+			X = data  
+			return X.values 
 
 	def _normalize(self, mat):
 		means = np.mean(mat, axis = 0)
@@ -88,15 +111,24 @@ class DataProcessor():
 		if enocde_user is False: 
 			df = self._drop_col(df, self.user_col)
 		
-		if np_split is True:
-			if normalize is True :
-				xtr, xva, ytr, yva = self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
-				return self._normalize(xtr), self._normalize(xva), ytr, yva
-			else:
-				return self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
-		else:
-			return self._extract_features_labels(df, self.label_col)
+		if self.test is False: 
 
+			if np_split is True:
+				if normalize is True :
+					xtr, xva, ytr, yva = self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
+					return self._normalize(xtr), self._normalize(xva), ytr, yva
+				else:
+					return self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
+			else:
+				return self._extract_features_labels(df, self.label_col)
+
+		else: 
+
+			if normalize is True :
+				xtr = self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
+				return self._normalize(xtr)
+			else:
+				return self._extract_features_labels(df, self.label_col)
 
 def main():
     pass
