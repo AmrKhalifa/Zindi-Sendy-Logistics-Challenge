@@ -4,7 +4,18 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
 class DataProcessor():
+	'''
+    The DataProcessor class is repsonsible for parsing the given .csv file. it contains the following attributes 
+    :file : (str) the path to the file. 
+    :test : (Bool) indicates if the file is the Testing set. 
+    :minimal:  (Bool) if True it drops from the training set the columns that are not found in the test set.    
+    :time_attributes: list of (str) the data-time attributes in the dataset. 
+    :categorical_attributes: list of (str) the categorical attributes in the dataset. 
+    :label_col: (str) the label column (Y-data) or target vector.
+    :encoder: (sklearn LabelEncoder object) the encoder used to encode categorical variables.
+    :user-col : (str) the name of User Id column.  
 
+    '''
 	def __init__(self, file = None, test = False, minimal = True ):
 		if file is None :  
 			self.file = "../data/Train.csv"
@@ -94,7 +105,22 @@ class DataProcessor():
 		return mat-means/stds
 
 	def get_numpy_data(self, fillna = True, encode = True, np_split = True, enocde_user = False, normalize = True): 
+		""" This is the only function you need to use from DataProcessor class to process the data 
 
+	    Parameters: 
+	    -----------
+	    fillna: (Bool) if True it fills the missing columns in the dataset with the mean values for that column
+	    encode: (Bool)  if True it encodes the categorical variables with integer values.
+	    np_split: (Bool) if True it splits to train and validation sets and returns 4 numpy arrays. 
+	    encode_user: (Bool) if True it encodes the user using 1-hot encoding (not implemented yet): default is False. 
+	    normalize: (Bool) if True it normalizes the dataset with z-score i.e. for each column it subtracts the mean value and divides by the standard deviation
+
+
+	    Returns:
+	    if np_split is True it returns 4 numpy arrays (x_train, x_valid, y_train, y_valid)
+	    if np_split is false it returns 2 numpu arrays (xtrain, y_train)
+
+	   """
 		df = self._load_file(self.file)
 
 		for col in self.cols_to_drop: 
