@@ -5,7 +5,8 @@ from sklearn.model_selection import train_test_split
 
 class DataProcessor():
 	'''
-    The DataProcessor class is repsonsible for parsing the given .csv file. it contains the following attributes 
+    The DataProcessor class is repsonsible for parsing the given .csv file.
+    ### Attributes ####
     :file : (str) the path to the file. 
     :test : (Bool) indicates if the file is the Testing set. 
     :minimal:  (Bool) if True it drops from the training set the columns that are not found in the test set.    
@@ -13,8 +14,7 @@ class DataProcessor():
     :categorical_attributes: list of (str) the categorical attributes in the dataset. 
     :label_col: (str) the label column (Y-data) or target vector.
     :encoder: (sklearn LabelEncoder object) the encoder used to encode categorical variables.
-    :user-col : (str) the name of User Id column.  
-
+    :user-col : (str) the name of User Id column.
     '''
 	def __init__(self, file = None, test = False, minimal = True ):
 		if file is None :  
