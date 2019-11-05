@@ -1,4 +1,4 @@
-# Zindi-s-Sendy-Logistics-Challenge
+# Zindi-Sendy-Logistics-Challenge
 
 ### How to use DataProcessor from data_processor.py module 
 #### Step 1: instantiate instance from DataProcessor: 
