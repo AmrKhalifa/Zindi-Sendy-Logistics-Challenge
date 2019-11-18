@@ -34,7 +34,11 @@ class DataProcessor():
 		self.user_col = ['User Id']
 		if test is False:
 			if minimal is True:  
-				self.cols_to_drop = ['Order No', 'Precipitation in millimeters', 'Arrival at Destination - Day of Month', 'Arrival at Destination - Weekday (Mo = 1)', 'Arrival at Destination - Time']
+				self.cols_to_drop = ['Order No', 'Precipitation in millimeters', 
+				'Arrival at Destination - Day of Month', 'Arrival at Destination - Weekday (Mo = 1)', 
+				'Arrival at Destination - Time', 'Confirmation - Day of Month', 
+				'Confirmation - Weekday (Mo = 1)', 'Pickup - Day of Month', 'Pickup - Weekday (Mo = 1)',
+				'Arrival at Pickup - Day of Month', 'Arrival at Pickup - Weekday (Mo = 1)']
 			else: 
 				self.cols_to_drop = ['Order No', 'Precipitation in millimeters']
 		else: 
