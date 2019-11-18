@@ -16,10 +16,13 @@ class DataProcessor():
     :encoder: (sklearn LabelEncoder object) the encoder used to encode categorical variables.
     :user-col : (str) the name of User Id column.
     '''
-	def __init__(self, file = None, test = False, minimal = True ):
+	def __init__(self, file = None, additional = None, test = False, minimal = True):
 		if file is None :  
 			self.file = "../data/Train.csv"
 		else: self.file = file
+		if additional is None: 
+			self.additional_file = '../data/additional_data/trainRoot_edited.csv'
+		else: self.additional_file = additional
 		if test is False:
 			if minimal is True:
 				self.time_attributes = ['Placement - Time', 'Confirmation - Time', 'Arrival at Pickup - Time', 'Pickup - Time']
@@ -32,6 +35,7 @@ class DataProcessor():
 		self.encoder = LabelEncoder
 		self.one_hot = None
 		self.user_col = ['User Id']
+		self.row_values = range(30)
 		if test is False:
 			if minimal is True:  
 				self.cols_to_drop = ['Order No', 'Precipitation in millimeters', 
@@ -49,8 +53,19 @@ class DataProcessor():
 		train_df = pd.read_csv(file)
 		return train_df
 
+	def _merge_additional_data(self, df, file):
+		additioal_df = pd.read_csv(self.additional_file)
+		result = pd.concat([df, additioal_df], axis=1, join='inner')
+		return result
+
+	def _drop_rows_by_value(self, df, col, values):
+		for value in values: 
+			df = df[df[col] != value]
+		return df 
+
 	def _drop_col(self, df, col_to_drop):
 		df = df.drop(col_to_drop, axis = 1)
+
 		return df 
 
 	def _fill_null(self, df): 
@@ -108,7 +123,7 @@ class DataProcessor():
 		stds += 1e-5
 		return mat-means/stds
 
-	def get_numpy_data(self, fillna = True, encode = True, np_split = True, enocde_user = False, normalize = True): 
+	def get_numpy_data(self, fillna = True, additional = True, encode = True, np_split = True, enocde_user = False, normalize = True, drop_ones = True): 
 		""" This is the only function you need to use from DataProcessor class to process the data 
 
 	    Parameters: 
@@ -126,6 +141,12 @@ class DataProcessor():
 
 	   """
 		df = self._load_file(self.file)
+
+		if additional is True:
+			df = self._merge_additional_data(df, self.additional_file)
+
+		if drop_ones is True:
+			df = self._drop_rows_by_value(df, self.label_col, self.row_values)
 
 		for col in self.cols_to_drop: 
 			df = self._drop_col(df, col)
