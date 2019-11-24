@@ -46,16 +46,18 @@ class DataProcessor():
 			else: 
 				self.cols_to_drop = ['Order No', 'Precipitation in millimeters']
 		else: 
-			self.cols_to_drop = ['Order No', 'Precipitation in millimeters']
+			self.cols_to_drop = ['Order No', 'Precipitation in millimeters','Confirmation - Day of Month', 
+				'Confirmation - Weekday (Mo = 1)', 'Pickup - Day of Month', 'Pickup - Weekday (Mo = 1)',
+				'Arrival at Pickup - Day of Month', 'Arrival at Pickup - Weekday (Mo = 1)']
 		self.test = test 
 
 	def _load_file(self, file): 
 		train_df = pd.read_csv(file)
 		return train_df
 
-	def _merge_additional_data(self, df, file):
-		additioal_df = pd.read_csv(self.additional_file)
-		result = pd.concat([df, additioal_df], axis=1, join='inner')
+	def _merge_additional_data(self, df):
+		additional_df = pd.read_csv(self.additional_file)
+		result = pd.concat([df, additional_df], axis=1, join='inner')
 		return result
 
 	def _drop_rows_by_value(self, df, col, values):
@@ -143,7 +145,7 @@ class DataProcessor():
 		df = self._load_file(self.file)
 
 		if additional is True:
-			df = self._merge_additional_data(df, self.additional_file)
+			df = self._merge_additional_data(df)
 
 		if drop_ones is True:
 			df = self._drop_rows_by_value(df, self.label_col, self.row_values)
@@ -179,7 +181,8 @@ class DataProcessor():
 				xtr = self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
 				return self._normalize(xtr)
 			else:
-				return self._extract_features_labels(df, self.label_col)
+				xtr = self._get_numpy_train_valid_data(self._extract_features_labels(df, self.label_col))
+				return xtr
 
 def main():
     pass
