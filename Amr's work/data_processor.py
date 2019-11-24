@@ -163,7 +163,7 @@ class DataProcessor():
 		
 		if enocde_user is False: 
 			df = self._drop_col(df, self.user_col)
-		
+
 		if self.test is False: 
 
 			if np_split is True:
